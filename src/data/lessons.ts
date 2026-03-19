@@ -97,6 +97,22 @@ export class WordLesson implements Lesson {
   }
 }
 
+export class TranslationLesson implements Lesson {
+  id: string
+  title: string
+  description: string
+  items: TranslationLessonItem[]
+  question_prompt: string
+
+  constructor({ id, title, description, items, question_prompt }: { id: string; title: string; description: string; items: TranslationLessonItem[]; question_prompt?: string }) {
+    this.id = id
+    this.title = title
+    this.description = description
+    this.items = items
+    this.question_prompt = question_prompt ?? 'Translate'
+  }
+}
+
 export const LESSONS: Lesson[] = [
   new LetterLesson({
     id: 'lesson-1',
@@ -129,7 +145,7 @@ export const LESSONS: Lesson[] = [
 
   new WordLesson({
     id: 'numbers',
-    title: 'Numbers 0–9',
+    title: 'Numbers 0–10',
     description: 'sefr · yek · do · se · ...',
     question_prompt: 'What is the romanisation of this number?',
     items: [
@@ -142,7 +158,59 @@ export const LESSONS: Lesson[] = [
       { persian: '6', roman: 'shesh', name: 'six'   },
       { persian: '7', roman: 'haft', name: 'seven' },
       { persian: '8', roman: 'hasht', name: 'eight' },
-      { persian: '9', roman: 'noh', name: 'nine'  },
+      { persian: '9', roman: 'noh', name: 'nine' },
+      { persian: '10', roman: 'dah', name: 'ten' },
+    ],
+  }),
+
+  new WordLesson({
+    id: 'numbers2',
+    title: 'Numbers 11–20',
+    description: 'yāzdah · dāzdah · ...',
+    question_prompt: 'What is the romanisation of this number?',
+    items: [
+      { persian: '11', roman: 'yāzdah', name: 'eleven' },
+      { persian: '12', roman: 'dāzdah', name: 'twelve' },
+      { persian: '13', roman: 'sizdah', name: 'thirteen' },
+      { persian: '14', roman: 'chahārdah', name: 'fourteen' },
+      { persian: '15', roman: 'pānzdah', name: 'fifteen' },
+      { persian: '16', roman: 'shānzdah', name: 'sixteen' },
+      { persian: '17', roman: 'hēfdah', name: 'seventeen' },
+      { persian: '18', roman: 'hējdah', name: 'eighteen' },
+      { persian: '19', roman: 'nūzdah', name: 'nineteen' },
+      { persian: '20', roman: 'bist', name: 'twenty' },
+    ],
+  }),
+
+  new WordLesson({
+    id: 'numbers3',
+    title: 'Numbers 21–30',
+    description: 'bist o yek · bist o do · ...',
+    question_prompt: 'What is the romanisation of this number?',
+    items: [
+      { persian: '21', roman: 'bist o yek', name: 'twenty-one' },
+      { persian: '22', roman: 'bist o do', name: 'twenty-two' },
+      { persian: '23', roman: 'bist o se', name: 'twenty-three' },
+      { persian: '24', roman: 'bist o chahār', name: 'twenty-four' },
+      { persian: '25', roman: 'bist o pān', name: 'twenty-five' },
+      { persian: '26', roman: 'bist o shesh', name: 'twenty-six' },
+      { persian: '27', roman: 'bist o haft', name: 'twenty-seven' },
+      { persian: '28', roman: 'bist o hasht', name: 'twenty-eight' },
+      { persian: '29', roman: 'bist o noh', name: 'twenty-nine' },
+      { persian: '30', roman: 'sī', name: 'thirty' },
+    ],
+  }),
+
+  new TranslationLesson({
+    id: 'greetings',
+    title: 'Basic Greetings',
+    description: 'Common phrases for saying hello and goodbye.',
+    items: [
+      { persian: 'سلام', roman: 'salām', english: 'Hello' },
+      { persian: 'خداحافظ', roman: 'khodāhāfez', english: 'Goodbye' },
+      { persian: 'صبح بخیر', roman: 'sobh bekheir', english: 'Good morning' },
+      { persian: 'شب بخیر', roman: 'shab bekheir', english: 'Good night' },
+      { persian: 'خوش آمدید', roman: 'khosh āmadid', english: 'Welcome' },
     ],
   }),
 ]
@@ -162,4 +230,9 @@ export function getRomanAlternativesFromLessons(...lessons: Lesson[]) {
 /** Return the items for a given lesson. */
 export function getLessonLetters(lesson: Lesson): LessonItem[] {
   return lesson.items
+}
+
+/** Type guard: is this a TranslationLesson? */
+export function isTranslationLesson(lesson: Lesson): lesson is TranslationLesson {
+  return lesson instanceof TranslationLesson
 }

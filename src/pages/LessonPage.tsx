@@ -1,9 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { LESSONS, Lesson, LessonItem, getLessonLetters } from '../data/lessons'
+import {
+  LESSONS, Lesson, LessonItem, TranslationLessonItem,
+  getLessonLetters, isTranslationLesson,
+} from '../data/lessons'
 import './LessonPage.css'
 
 // -- helpers -----------------------------------------------------------------
+
+type Direction = 'en-to-fa' | 'fa-to-en'
 
 function shuffle<T>(arr: T[]) {
   const a = [...arr]
@@ -14,18 +19,29 @@ function shuffle<T>(arr: T[]) {
   return a
 }
 
-/**
- * Build a set of 4 choices for a letter:
- *   - 1 correct answer
- *   - 3 distractors drawn from all selected lessons (different roman value)
- */
-function buildChoices(lessons: Lesson[], correct: LessonItem) {
-  const allLetters = lessons.flatMap((l) => getLessonLetters(l))
-  const distractors = shuffle(
-    allLetters.filter((l) => l.roman !== correct.roman),
-  ).slice(0, 3)
+/** The value used to determine correctness for a given direction. */
+function answerKey(item: LessonItem, direction: Direction): string {
+  if (direction === 'fa-to-en' && 'english' in item)
+    return (item as TranslationLessonItem).english
+  if (direction === 'en-to-fa')
+    return item.persian
+  return item.roman
+}
 
+function buildChoices(lessons: Lesson[], correct: LessonItem, direction: Direction) {
+  const allItems = lessons.flatMap((l) => getLessonLetters(l))
+  const correctKey = answerKey(correct, direction)
+  const distractors = shuffle(
+    allItems.filter((l) => answerKey(l, direction) !== correctKey),
+  ).slice(0, 3)
   return shuffle([correct, ...distractors])
+}
+
+function buildQueue(lessons: Lesson[], direction: Direction) {
+  return shuffle(lessons.flatMap((l) => getLessonLetters(l))).map((letter) => ({
+    letter,
+    choices: buildChoices(lessons, letter, direction),
+  }))
 }
 
 // -- component ----------------------------------------------------------------
@@ -38,14 +54,11 @@ export default function LessonPage() {
 
   const ids = lessonIds ? lessonIds.split(',') : []
   const lessons = LESSONS.filter((l) => ids.includes(l.id))
+  const isTranslationMode = lessons.length > 0 && lessons.every(isTranslationLesson)
 
+  const [direction, setDirection] = useState<Direction>('en-to-fa')
   const [queue, setQueue] = useState(() =>
-    lessons.length > 0
-      ? shuffle(lessons.flatMap((l) => getLessonLetters(l))).map((letter) => ({
-          letter,
-          choices: buildChoices(lessons, letter),
-        }))
-      : [],
+    lessons.length > 0 ? buildQueue(lessons, 'en-to-fa') : [],
   )
   const [index, setIndex] = useState(0)
   const [status, setStatus] = useState(STATUS.IDLE)
@@ -60,7 +73,7 @@ export default function LessonPage() {
     (choice: LessonItem) => {
       if (status !== STATUS.IDLE) return
 
-      const isCorrect = choice.roman === current.letter.roman
+      const isCorrect = answerKey(choice, direction) === answerKey(current.letter, direction)
       setSelected(choice)
       setStatus(isCorrect ? STATUS.CORRECT : STATUS.WRONG)
       if (isCorrect) {
@@ -69,7 +82,7 @@ export default function LessonPage() {
         setFailedOn((f) => [...f, current.letter])
       }
     },
-    [status, current],
+    [status, current, direction],
   )
 
   const handleNext = useCallback(() => {
@@ -97,7 +110,7 @@ export default function LessonPage() {
     const failed = failedOn.length > 0 ? failedOn : lessons.flatMap((l) => getLessonLetters(l))
     setQueue(shuffle(failed).map((letter) => ({
       letter,
-      choices: buildChoices(lessons, letter),
+      choices: buildChoices(lessons, letter, direction),
     })))
     setIndex(0)
     setScore(0)
@@ -105,22 +118,31 @@ export default function LessonPage() {
     setSelected(null)
     setDone(false)
     setFailedOn([])
-  }, [lessons, selected, status])
+  }, [lessons, direction, selected, status])
 
   const handleRestart = useCallback(() => {
-    setQueue(
-      shuffle(lessons.flatMap((l) => getLessonLetters(l))).map((letter) => ({
-        letter,
-        choices: buildChoices(lessons, letter),
-      }))
-    )
+    setQueue(buildQueue(lessons, direction))
     setIndex(0)
     setScore(0)
     setStatus(STATUS.IDLE)
     setSelected(null)
     setDone(false)
     setFailedOn([])
-  }, [lessons])
+  }, [lessons, direction])
+
+  // Rebuild queue when direction changes -------------------------------------
+  useEffect(() => {
+    if (lessons.length === 0) return
+    setQueue(buildQueue(lessons, direction))
+    setIndex(0)
+    setScore(0)
+    setStatus(STATUS.IDLE)
+    setSelected(null)
+    setDone(false)
+    setFailedOn([])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [direction])
+  // -------------------------------------------------------------------------
 
   if (lessons.length === 0) {
     return (
@@ -174,20 +196,58 @@ export default function LessonPage() {
         />
       </div>
 
+      {/* direction toggle (TranslationLesson only) */}
+      {isTranslationMode && (
+        <div className="direction-toggle">
+          <button
+            className={direction === 'en-to-fa' ? 'active' : ''}
+            onClick={() => setDirection('en-to-fa')}
+          >
+            English → فارسی
+          </button>
+          <button
+            className={direction === 'fa-to-en' ? 'active' : ''}
+            onClick={() => setDirection('fa-to-en')}
+          >
+            فارسی → English
+          </button>
+        </div>
+      )}
+
       {/* card */}
       <div className="card">
-        <div className="persian-letter">{current.letter.persian}</div>
+        {direction === 'fa-to-en' ? (
+          <>
+            <div className="persian-letter">{current.letter.persian}</div>
+            <div className="card-roman">{current.letter.roman}</div>
+          </>
+        ) : isTranslationMode ? (
+          <div className="card-english">
+            {'english' in current.letter
+              ? (current.letter as TranslationLessonItem).english
+              : current.letter.persian}
+          </div>
+        ) : (
+          <div className="persian-letter">{current.letter.persian}</div>
+        )}
         <p className="card-prompt">{lessons[0].question_prompt}</p>
       </div>
 
       {/* choices */}
       <div className="choices">
         {current.choices.map((choice) => {
+          const choiceKey = answerKey(choice, direction)
+          const correctKey = answerKey(current.letter, direction)
           let cls = 'choice-btn'
           if (status !== STATUS.IDLE) {
-            if (choice.roman === current.letter.roman) cls += ' correct'
+            if (choiceKey === correctKey) cls += ' correct'
             else if (choice === selected) cls += ' wrong'
           }
+          const label = direction === 'fa-to-en' && 'english' in choice
+            ? (choice as TranslationLessonItem).english
+            : direction === 'en-to-fa' && isTranslationMode
+              ? <><span className="choice-persian">{choice.persian}</span><span className="choice-roman">{choice.roman}</span></>
+              : choice.roman
           return (
             <button
               key={choice.persian + choice.roman}
@@ -195,22 +255,30 @@ export default function LessonPage() {
               onClick={() => handleChoice(choice)}
               disabled={status !== STATUS.IDLE}
             >
-              {choice.roman}
+              {label}
             </button>
           )
         })}
       </div>
 
       {/* feedback + next */}
-      {status !== STATUS.IDLE && (
-        <div className={`feedback ${status}`}>
-          <span>{status === STATUS.CORRECT ? '✓ Correct!' : `✗ It was "${current.letter.roman}"`}</span>
-          <button className="btn btn-primary next-btn" onClick={handleNext}>
-            {index + 1 < queue.length ? 'Skip →' : 'See results'}
-          </button>
-          <div className="auto-advance-bar" />
-        </div>
-      )}
+      {status !== STATUS.IDLE && (() => {
+        const correctItem = current.letter
+        const correctLabel = direction === 'fa-to-en' && 'english' in correctItem
+          ? (correctItem as TranslationLessonItem).english
+          : direction === 'en-to-fa' && isTranslationMode
+            ? `${correctItem.persian} (${correctItem.roman})`
+            : correctItem.roman
+        return (
+          <div className={`feedback ${status}`}>
+            <span>{status === STATUS.CORRECT ? '✓ Correct!' : `✗ It was "${correctLabel}"`}</span>
+            <button className="btn btn-primary next-btn" onClick={handleNext}>
+              {index + 1 < queue.length ? 'Skip →' : 'See results'}
+            </button>
+            <div className="auto-advance-bar" />
+          </div>
+        )
+      })()}
     </div>
   )
 }
