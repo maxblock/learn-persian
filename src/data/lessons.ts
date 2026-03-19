@@ -16,6 +16,10 @@ export interface LessonItem {
   name?: string
 }
 
+export interface TranslationLessonItem extends LessonItem {
+  english: string
+}
+
 export const ALPHABET = [
   { persian: 'ا', name: 'Alef',   roman: 'ā' },
   { persian: 'ب', name: 'Be',     roman: 'b' },

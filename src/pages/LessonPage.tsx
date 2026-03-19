@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { LESSONS, Lesson, LessonItem, getLessonLetters } from '../data/lessons'
 import './LessonPage.css'
@@ -81,6 +81,17 @@ export default function LessonPage() {
       setSelected(null)
     }
   }, [index, queue.length])
+
+  // Auto-advance after 1 s --------------------------------------------------
+  const handleNextRef = useRef(handleNext)
+  useEffect(() => { handleNextRef.current = handleNext }, [handleNext])
+
+  useEffect(() => {
+    if (status === STATUS.IDLE) return
+    const id = setTimeout(() => handleNextRef.current(), 500)
+    return () => clearTimeout(id)
+  }, [status])
+  // -------------------------------------------------------------------------
 
   const handleRetry = useCallback(() => {
     const failed = failedOn.length > 0 ? failedOn : lessons.flatMap((l) => getLessonLetters(l))
@@ -193,10 +204,11 @@ export default function LessonPage() {
       {/* feedback + next */}
       {status !== STATUS.IDLE && (
         <div className={`feedback ${status}`}>
-          {status === STATUS.CORRECT ? '✓ Correct!' : `✗ It was "${current.letter.roman}"`}
+          <span>{status === STATUS.CORRECT ? '✓ Correct!' : `✗ It was "${current.letter.roman}"`}</span>
           <button className="btn btn-primary next-btn" onClick={handleNext}>
-            {index + 1 < queue.length ? 'Next →' : 'See results'}
+            {index + 1 < queue.length ? 'Skip →' : 'See results'}
           </button>
+          <div className="auto-advance-bar" />
         </div>
       )}
     </div>
