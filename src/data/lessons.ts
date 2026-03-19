@@ -10,6 +10,8 @@
  * the authoritative values.
  */
 
+export type LessonType = 'letter' | 'word' | 'translation'
+
 export interface LessonItem {
   persian: string
   roman: string
@@ -61,6 +63,7 @@ export interface Lesson {
   description: string
   items: LessonItem[]
   question_prompt: string
+  lesson_type: LessonType
 }
 
 export class LetterLesson implements Lesson {
@@ -69,6 +72,7 @@ export class LetterLesson implements Lesson {
   description: string
   items: LessonItem[]
   question_prompt: string
+  lesson_type: LessonType = 'letter'
 
   constructor({ id, letterKeys }: { id: string; letterKeys: string[] }) {
     this.id = id
@@ -87,6 +91,7 @@ export class WordLesson implements Lesson {
   description: string
   items: LessonItem[]
   question_prompt: string
+  lesson_type: LessonType = 'word'
 
   constructor({ id, title, description, items, question_prompt }: { id: string; title: string; description: string; items: LessonItem[]; question_prompt?: string }) {
     this.id = id
@@ -103,6 +108,7 @@ export class TranslationLesson implements Lesson {
   description: string
   items: TranslationLessonItem[]
   question_prompt: string
+  lesson_type: LessonType = 'translation'
 
   constructor({ id, title, description, items, question_prompt }: { id: string; title: string; description: string; items: TranslationLessonItem[]; question_prompt?: string }) {
     this.id = id

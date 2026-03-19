@@ -3,15 +3,29 @@ import { useNavigate } from 'react-router-dom'
 import { LESSONS } from '../data/lessons.ts'
 import './LandingPage.css'
 
+const TAB_LABELS = {
+  letter: 'Letters',
+  word: 'Words',
+  translation: 'Vocabulary',
+}
+
 export default function LandingPage() {
   const navigate = useNavigate()
-  const [selectedIds, setSelectedIds] = useState(new Set())
+
+  // Derive available tabs in the order they first appear in LESSONS
+  const availableTabs = [...new Set(LESSONS.map((l) => l.lesson_type))]
+
+  const [activeTab, setActiveTab] = useState(availableTabs[0])
+  const [selectedByTab, setSelectedByTab] = useState({})
+
+  const selectedIds = new Set(selectedByTab[activeTab] ?? [])
+  const visibleLessons = LESSONS.filter((l) => l.lesson_type === activeTab)
 
   function toggleLesson(id) {
-    setSelectedIds((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
+    setSelectedByTab((prev) => {
+      const current = new Set(prev[activeTab] ?? [])
+      current.has(id) ? current.delete(id) : current.add(id)
+      return { ...prev, [activeTab]: [...current] }
     })
   }
 
@@ -28,9 +42,26 @@ export default function LandingPage() {
       </header>
 
       <main>
+        {/* tabs */}
+        {availableTabs.length > 1 && (
+          <div className="lesson-tabs" role="tablist">
+            {availableTabs.map((tab) => (
+              <button
+                key={tab}
+                role="tab"
+                aria-selected={tab === activeTab}
+                className={`lesson-tab${tab === activeTab ? ' active' : ''}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {TAB_LABELS[tab]}
+              </button>
+            ))}
+          </div>
+        )}
+
         <h2 className="lessons-heading">Choose one or more lessons</h2>
         <ul className="lesson-list">
-          {LESSONS.map((lesson) => {
+          {visibleLessons.map((lesson) => {
             const isSelected = selectedIds.has(lesson.id)
             return (
               <li key={lesson.id}>
