@@ -19,9 +19,9 @@ function shuffle(arr) {
  *   - 1 correct answer
  *   - 3 distractors drawn from the full alphabet (different roman value)
  */
-function buildChoices(correct) {
+function buildChoices(lesson, correct) {
   const distractors = shuffle(
-    ALPHABET.filter((l) => l.roman !== correct.roman),
+    getLessonLetters(lesson).filter((l) => l.roman !== correct.roman),
   ).slice(0, 3)
 
   return shuffle([correct, ...distractors])
@@ -30,7 +30,7 @@ function buildChoices(correct) {
 function buildQueue(lesson) {
   return shuffle(getLessonLetters(lesson)).map((letter) => ({
     letter,
-    choices: buildChoices(letter),
+    choices: buildChoices(lesson, letter),
   }))
 }
 
