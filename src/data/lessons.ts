@@ -10,6 +10,12 @@
  * the authoritative values.
  */
 
+export interface LessonItem {
+  persian: string
+  roman: string
+  name?: string
+}
+
 export const ALPHABET = [
   { persian: 'ا', name: 'Alef',   roman: 'ā' },
   { persian: 'ب', name: 'Be',     roman: 'b' },
@@ -49,20 +55,41 @@ export interface Lesson {
   id: string
   title: string
   description: string
-  letterKeys: string[]
+  items: LessonItem[]
+  question_prompt: string
 }
 
 export class LetterLesson implements Lesson {
   id: string
   title: string
   description: string
-  letterKeys: string[]
+  items: LessonItem[]
+  question_prompt: string
 
   constructor({ id, letterKeys }: { id: string; letterKeys: string[] }) {
     this.id = id
-    this.title = letterKeys.join(' · ')
-    this.description = letterKeys.map(getLetter).map((l) => l!.roman).join(' ')
-    this.letterKeys = letterKeys
+    this.items = letterKeys
+      .map(getLetter)
+      .filter((l): l is NonNullable<ReturnType<typeof getLetter>> => l !== undefined)
+    this.title = this.items.map((l) => l.persian).join(' · ')
+    this.description = this.items.map((l) => l.roman).join(' ')
+    this.question_prompt = 'What is the romanisation of this letter?'
+  }
+}
+
+export class WordLesson implements Lesson {
+  id: string
+  title: string
+  description: string
+  items: LessonItem[]
+  question_prompt: string
+
+  constructor({ id, title, description, items, question_prompt }: { id: string; title: string; description: string; items: LessonItem[]; question_prompt?: string }) {
+    this.id = id
+    this.title = title
+    this.description = description
+    this.items = items
+    this.question_prompt = question_prompt ?? 'What is this word?'
   }
 }
 
@@ -95,6 +122,25 @@ export const LESSONS: Lesson[] = [
     id: 'lesson-7',
     letterKeys: ['ل', 'م', 'ن', 'و', 'ه', 'ی'],
   }),
+
+  new WordLesson({
+    id: 'numbers',
+    title: 'Numbers 0–9',
+    description: 'sefr · yek · do · se · ...',
+    question_prompt: 'What is the romanisation of this number?',
+    items: [
+      { persian: '0', roman: 'sefr', name: 'zero'  },
+      { persian: '1', roman: 'yek', name: 'one'   },
+      { persian: '2', roman: 'do', name: 'two'   },
+      { persian: '3', roman: 'se', name: 'three' },
+      { persian: '4', roman: 'chahār', name: 'four'  },
+      { persian: '5', roman: 'panj',  name: 'five'  },
+      { persian: '6', roman: 'shesh', name: 'six'   },
+      { persian: '7', roman: 'haft', name: 'seven' },
+      { persian: '8', roman: 'hasht', name: 'eight' },
+      { persian: '9', roman: 'noh', name: 'nine'  },
+    ],
+  }),
 ]
 
 /** Return the full letter object for a given Persian character. */
@@ -109,7 +155,7 @@ export function getRomanAlternativesFromLessons(...lessons: Lesson[]) {
   return Array.from(romanSet)
 }
 
-/** Return the letters for a given lesson. */
-export function getLessonLetters(lesson: Lesson) {
-  return lesson.letterKeys.map(getLetter).filter((l): l is NonNullable<ReturnType<typeof getLetter>> => l !== undefined)
+/** Return the items for a given lesson. */
+export function getLessonLetters(lesson: Lesson): LessonItem[] {
+  return lesson.items
 }

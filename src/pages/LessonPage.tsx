@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { LESSONS, Lesson, getLessonLetters } from '../data/lessons'
+import { LESSONS, Lesson, LessonItem, getLessonLetters } from '../data/lessons'
 import './LessonPage.css'
 
 // -- helpers -----------------------------------------------------------------
 
-function shuffle(arr) {
+function shuffle<T>(arr: T[]) {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
@@ -19,7 +19,7 @@ function shuffle(arr) {
  *   - 1 correct answer
  *   - 3 distractors drawn from all selected lessons (different roman value)
  */
-function buildChoices(lessons: Lesson[], correct: { roman: string }) {
+function buildChoices(lessons: Lesson[], correct: LessonItem) {
   const allLetters = lessons.flatMap((l) => getLessonLetters(l))
   const distractors = shuffle(
     allLetters.filter((l) => l.roman !== correct.roman),
@@ -49,15 +49,15 @@ export default function LessonPage() {
   )
   const [index, setIndex] = useState(0)
   const [status, setStatus] = useState(STATUS.IDLE)
-  const [selected, setSelected] = useState<ReturnType<typeof getLessonLetters>[number] | null>(null)
+  const [selected, setSelected] = useState<LessonItem | null>(null)
   const [score, setScore] = useState(0)
   const [done, setDone] = useState(false)
-  const [failedOn, setFailedOn] = useState<ReturnType<typeof getLessonLetters>[number][]>([])
+  const [failedOn, setFailedOn] = useState<LessonItem[]>([])
 
   const current = queue[index]
 
   const handleChoice = useCallback(
-    (choice: ReturnType<typeof getLessonLetters>[number]) => {
+    (choice: LessonItem) => {
       if (status !== STATUS.IDLE) return
 
       const isCorrect = choice.roman === current.letter.roman
@@ -166,7 +166,7 @@ export default function LessonPage() {
       {/* card */}
       <div className="card">
         <div className="persian-letter">{current.letter.persian}</div>
-        <p className="card-prompt">What is the romanisation of this letter?</p>
+        <p className="card-prompt">{lessons[0].question_prompt}</p>
       </div>
 
       {/* choices */}
