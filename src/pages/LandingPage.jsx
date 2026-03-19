@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { LESSONS } from '../data/lessons'
+import { LESSONS } from '../data/lessons.ts'
 import './LandingPage.css'
 
 export default function LandingPage() {

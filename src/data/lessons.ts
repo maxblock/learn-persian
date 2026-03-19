@@ -45,57 +45,71 @@ export const ALPHABET = [
   { persian: 'ی', name: 'Ye',     roman: 'y' },
 ]
 
-export const LESSONS = [
-  {
+export interface Lesson {
+  id: string
+  title: string
+  description: string
+  letterKeys: string[]
+}
+
+export class LetterLesson implements Lesson {
+  id: string
+  title: string
+  description: string
+  letterKeys: string[]
+
+  constructor({ id, letterKeys }: { id: string; letterKeys: string[] }) {
+    this.id = id
+    this.title = letterKeys.join(' · ')
+    this.description = letterKeys.map(getLetter).map((l) => l!.roman).join(' ')
+    this.letterKeys = letterKeys
+  }
+}
+
+export const LESSONS: Lesson[] = [
+  new LetterLesson({
     id: 'lesson-1',
-    title: 'ا ب پ ت ث',
-    description: 'Alef · Be · Pe · Te · Se',
     letterKeys: ['ا', 'ب', 'پ', 'ت', 'ث'],
-  },
-  {
+  }),
+  new LetterLesson({
     id: 'lesson-2',
-    title: 'ج چ ح خ',
-    description: 'Jim · Che · He · Khe',
     letterKeys: ['ج', 'چ', 'ح', 'خ'],
-  },
-  {
+  }),
+  new LetterLesson({
     id: 'lesson-3',
-    title: 'د ذ ر ز ژ',
-    description: 'Dal · Zal · Re · Ze · Zhe',
     letterKeys: ['د', 'ذ', 'ر', 'ز', 'ژ'],
-  },
-  {
+  }),
+  new LetterLesson({
     id: 'lesson-4',
-    title: 'س ش ص ض',
-    description: 'Sin · Shin · Sad · Zad',
     letterKeys: ['س', 'ش', 'ص', 'ض'],
-  },
-  {
+  }),
+  new LetterLesson({
     id: 'lesson-5',
-    title: 'ط ظ ع غ',
-    description: 'Ta · Za · Eyn · Gheyn',
     letterKeys: ['ط', 'ظ', 'ع', 'غ'],
-  },
-  {
+  }),
+  new LetterLesson({
     id: 'lesson-6',
-    title: 'ف ق ک گ',
-    description: 'Fe · Qaf · Kaf · Gaf',
     letterKeys: ['ف', 'ق', 'ک', 'گ'],
-  },
-  {
+  }),
+  new LetterLesson({
     id: 'lesson-7',
-    title: 'ل م ن و ه ی',
-    description: 'Lam · Mim · Nun · Vav · He · Ye',
     letterKeys: ['ل', 'م', 'ن', 'و', 'ه', 'ی'],
-  },
+  }),
 ]
 
 /** Return the full letter object for a given Persian character. */
-export function getLetter(persian) {
+export function getLetter(persian: string) {
   return ALPHABET.find((l) => l.persian === persian)
 }
 
+/** Return the romanisation alternatives for a given set of lessons. */
+export function getRomanAlternativesFromLessons(...lessons: Lesson[]) {
+  const letters = lessons.flatMap((lesson) => getLessonLetters(lesson))
+  const romanSet = new Set(letters.map((l) => l!.roman))
+  return Array.from(romanSet)
+}
+
 /** Return the letters for a given lesson. */
-export function getLessonLetters(lesson) {
+export function getLessonLetters(lesson: Lesson) {
   return lesson.letterKeys.map(getLetter)
 }
