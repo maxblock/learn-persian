@@ -111,5 +111,5 @@ export function getRomanAlternativesFromLessons(...lessons: Lesson[]) {
 
 /** Return the letters for a given lesson. */
 export function getLessonLetters(lesson: Lesson) {
-  return lesson.letterKeys.map(getLetter)
+  return lesson.letterKeys.map(getLetter).filter((l): l is NonNullable<ReturnType<typeof getLetter>> => l !== undefined)
 }

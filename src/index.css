@@ -34,6 +34,11 @@ button {
   font-family: inherit;
 }
 
+button:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
 .btn {
   display: inline-block;
   padding: 0.6rem 1.4rem;
@@ -51,6 +56,11 @@ button {
   color: #fff;
 }
 .btn-primary:hover { background: var(--color-primary-h); }
+.btn-primary:disabled {
+  background: var(--color-primary);
+  color: #fff;
+  opacity: 0.6;
+}
 
 .btn-secondary {
   background: var(--color-surface);

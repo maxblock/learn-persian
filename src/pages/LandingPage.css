@@ -71,3 +71,45 @@
   font-size: 0.85rem;
   color: var(--color-muted);
 }
+
+.lesson-card.selected {
+  border-color: var(--color-primary);
+  background: #221f3a;
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.lesson-card.selected .lesson-description {
+  color: var(--color-text);
+  opacity: 0.75;
+}
+
+.start-bar {
+  position: sticky;
+  bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  pointer-events: none;
+}
+
+.start-btn {
+  pointer-events: all;
+  padding: 0.85rem 2.5rem;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  transition: background 0.15s, transform 0.1s;
+}
+
+.start-btn:hover {
+  background: color-mix(in srgb, var(--color-primary) 80%, white);
+}
+
+.start-btn:active {
+  transform: scale(0.97);
+}

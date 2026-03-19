@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { LESSONS, ALPHABET, getLessonLetters } from '../data/lessons'
+import { LESSONS, Lesson, getLessonLetters } from '../data/lessons'
 import './LessonPage.css'
 
 // -- helpers -----------------------------------------------------------------
@@ -17,21 +17,15 @@ function shuffle(arr) {
 /**
  * Build a set of 4 choices for a letter:
  *   - 1 correct answer
- *   - 3 distractors drawn from the full alphabet (different roman value)
+ *   - 3 distractors drawn from all selected lessons (different roman value)
  */
-function buildChoices(lesson, correct) {
+function buildChoices(lessons: Lesson[], correct: { roman: string }) {
+  const allLetters = lessons.flatMap((l) => getLessonLetters(l))
   const distractors = shuffle(
-    getLessonLetters(lesson).filter((l) => l.roman !== correct.roman),
+    allLetters.filter((l) => l.roman !== correct.roman),
   ).slice(0, 3)
 
   return shuffle([correct, ...distractors])
-}
-
-function buildQueue(lesson) {
-  return shuffle(getLessonLetters(lesson)).map((letter) => ({
-    letter,
-    choices: buildChoices(lesson, letter),
-  }))
 }
 
 // -- component ----------------------------------------------------------------
@@ -39,28 +33,41 @@ function buildQueue(lesson) {
 const STATUS = { IDLE: 'idle', CORRECT: 'correct', WRONG: 'wrong' }
 
 export default function LessonPage() {
-  const { lessonId } = useParams()
+  const { lessonIds } = useParams()
   const navigate = useNavigate()
 
-  const lesson = LESSONS.find((l) => l.id === lessonId)
+  const ids = lessonIds ? lessonIds.split(',') : []
+  const lessons = LESSONS.filter((l) => ids.includes(l.id))
 
-  const [queue, setQueue] = useState(() => (lesson ? buildQueue(lesson) : []))
+  const [queue, setQueue] = useState(() =>
+    lessons.length > 0
+      ? shuffle(lessons.flatMap((l) => getLessonLetters(l))).map((letter) => ({
+          letter,
+          choices: buildChoices(lessons, letter),
+        }))
+      : [],
+  )
   const [index, setIndex] = useState(0)
   const [status, setStatus] = useState(STATUS.IDLE)
-  const [selected, setSelected] = useState(null)
+  const [selected, setSelected] = useState<ReturnType<typeof getLessonLetters>[number] | null>(null)
   const [score, setScore] = useState(0)
   const [done, setDone] = useState(false)
+  const [failedOn, setFailedOn] = useState<ReturnType<typeof getLessonLetters>[number][]>([])
 
   const current = queue[index]
 
   const handleChoice = useCallback(
-    (choice) => {
+    (choice: ReturnType<typeof getLessonLetters>[number]) => {
       if (status !== STATUS.IDLE) return
 
       const isCorrect = choice.roman === current.letter.roman
       setSelected(choice)
       setStatus(isCorrect ? STATUS.CORRECT : STATUS.WRONG)
-      if (isCorrect) setScore((s) => s + 1)
+      if (isCorrect) {
+        setScore((s) => s + 1)
+      } else {
+        setFailedOn((f) => [...f, current.letter])
+      }
     },
     [status, current],
   )
@@ -75,16 +82,36 @@ export default function LessonPage() {
     }
   }, [index, queue.length])
 
-  const handleRestart = useCallback(() => {
-    setQueue(buildQueue(lesson))
+  const handleRetry = useCallback(() => {
+    const failed = failedOn.length > 0 ? failedOn : lessons.flatMap((l) => getLessonLetters(l))
+    setQueue(shuffle(failed).map((letter) => ({
+      letter,
+      choices: buildChoices(lessons, letter),
+    })))
     setIndex(0)
     setScore(0)
     setStatus(STATUS.IDLE)
     setSelected(null)
     setDone(false)
-  }, [lesson])
+    setFailedOn([])
+  }, [lessons, selected, status])
 
-  if (!lesson) {
+  const handleRestart = useCallback(() => {
+    setQueue(
+      shuffle(lessons.flatMap((l) => getLessonLetters(l))).map((letter) => ({
+        letter,
+        choices: buildChoices(lessons, letter),
+      }))
+    )
+    setIndex(0)
+    setScore(0)
+    setStatus(STATUS.IDLE)
+    setSelected(null)
+    setDone(false)
+    setFailedOn([])
+  }, [lessons])
+
+  if (lessons.length === 0) {
     return (
       <div className="lesson-page">
         <p>Lesson not found.</p>
@@ -103,6 +130,9 @@ export default function LessonPage() {
         <div className="done-actions">
           <button className="btn btn-primary" onClick={handleRestart}>
             Try again
+          </button>
+          <button className="btn btn-primary" onClick={handleRetry} disabled={failedOn.length === 0}>
+            Try failed ones again
           </button>
           <button className="btn btn-secondary" onClick={() => navigate('/')}>
             ← All lessons
