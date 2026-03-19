@@ -120,93 +120,6 @@ export class TranslationLesson implements Lesson {
 }
 
 export const LESSONS: Lesson[] = [
-  new LetterLesson({
-    id: 'lesson-1',
-    letterKeys: ['ا', 'ب', 'پ', 'ت', 'ث'],
-  }),
-  new LetterLesson({
-    id: 'lesson-2',
-    letterKeys: ['ج', 'چ', 'ح', 'خ'],
-  }),
-  new LetterLesson({
-    id: 'lesson-3',
-    letterKeys: ['د', 'ذ', 'ر', 'ز', 'ژ'],
-  }),
-  new LetterLesson({
-    id: 'lesson-4',
-    letterKeys: ['س', 'ش', 'ص', 'ض'],
-  }),
-  new LetterLesson({
-    id: 'lesson-5',
-    letterKeys: ['ط', 'ظ', 'ع', 'غ'],
-  }),
-  new LetterLesson({
-    id: 'lesson-6',
-    letterKeys: ['ف', 'ق', 'ک', 'گ'],
-  }),
-  new LetterLesson({
-    id: 'lesson-7',
-    letterKeys: ['ل', 'م', 'ن', 'و', 'ه', 'ی'],
-  }),
-
-  new WordLesson({
-    id: 'numbers',
-    title: 'Numbers 0–10',
-    description: 'sefr · yek · do · se · ...',
-    question_prompt: 'What is the romanisation of this number?',
-    items: [
-      { persian: '0', roman: 'sefr', name: 'zero'  },
-      { persian: '1', roman: 'yek', name: 'one'   },
-      { persian: '2', roman: 'do', name: 'two'   },
-      { persian: '3', roman: 'se', name: 'three' },
-      { persian: '4', roman: 'chahār', name: 'four'  },
-      { persian: '5', roman: 'panj',  name: 'five'  },
-      { persian: '6', roman: 'shesh', name: 'six'   },
-      { persian: '7', roman: 'haft', name: 'seven' },
-      { persian: '8', roman: 'hasht', name: 'eight' },
-      { persian: '9', roman: 'noh', name: 'nine' },
-      { persian: '10', roman: 'dah', name: 'ten' },
-    ],
-  }),
-
-  new WordLesson({
-    id: 'numbers2',
-    title: 'Numbers 11–20',
-    description: 'yāzdah · dāzdah · ...',
-    question_prompt: 'What is the romanisation of this number?',
-    items: [
-      { persian: '11', roman: 'yāzdah', name: 'eleven' },
-      { persian: '12', roman: 'dāzdah', name: 'twelve' },
-      { persian: '13', roman: 'sizdah', name: 'thirteen' },
-      { persian: '14', roman: 'chahārdah', name: 'fourteen' },
-      { persian: '15', roman: 'pānzdah', name: 'fifteen' },
-      { persian: '16', roman: 'shānzdah', name: 'sixteen' },
-      { persian: '17', roman: 'hēfdah', name: 'seventeen' },
-      { persian: '18', roman: 'hējdah', name: 'eighteen' },
-      { persian: '19', roman: 'nūzdah', name: 'nineteen' },
-      { persian: '20', roman: 'bist', name: 'twenty' },
-    ],
-  }),
-
-  new WordLesson({
-    id: 'numbers3',
-    title: 'Numbers 21–30',
-    description: 'bist o yek · bist o do · ...',
-    question_prompt: 'What is the romanisation of this number?',
-    items: [
-      { persian: '21', roman: 'bist o yek', name: 'twenty-one' },
-      { persian: '22', roman: 'bist o do', name: 'twenty-two' },
-      { persian: '23', roman: 'bist o se', name: 'twenty-three' },
-      { persian: '24', roman: 'bist o chahār', name: 'twenty-four' },
-      { persian: '25', roman: 'bist o pān', name: 'twenty-five' },
-      { persian: '26', roman: 'bist o shesh', name: 'twenty-six' },
-      { persian: '27', roman: 'bist o haft', name: 'twenty-seven' },
-      { persian: '28', roman: 'bist o hasht', name: 'twenty-eight' },
-      { persian: '29', roman: 'bist o noh', name: 'twenty-nine' },
-      { persian: '30', roman: 'sī', name: 'thirty' },
-    ],
-  }),
-
   new TranslationLesson({
     id: 'greetings',
     title: 'Basic Greetings',
@@ -292,6 +205,93 @@ export const LESSONS: Lesson[] = [
       { persian: 'بازو', roman: 'bāzu', english: 'Arm' },
       { persian: 'سینه', roman: 'sineh', english: 'Chest' },
       { persian: 'پشت', roman: 'posht', english: 'Back' },
+    ],
+  }),
+
+  new LetterLesson({
+    id: 'lesson-1',
+    letterKeys: ['ا', 'ب', 'پ', 'ت', 'ث'],
+  }),
+  new LetterLesson({
+    id: 'lesson-2',
+    letterKeys: ['ج', 'چ', 'ح', 'خ'],
+  }),
+  new LetterLesson({
+    id: 'lesson-3',
+    letterKeys: ['د', 'ذ', 'ر', 'ز', 'ژ'],
+  }),
+  new LetterLesson({
+    id: 'lesson-4',
+    letterKeys: ['س', 'ش', 'ص', 'ض'],
+  }),
+  new LetterLesson({
+    id: 'lesson-5',
+    letterKeys: ['ط', 'ظ', 'ع', 'غ'],
+  }),
+  new LetterLesson({
+    id: 'lesson-6',
+    letterKeys: ['ف', 'ق', 'ک', 'گ'],
+  }),
+  new LetterLesson({
+    id: 'lesson-7',
+    letterKeys: ['ل', 'م', 'ن', 'و', 'ه', 'ی'],
+  }),
+
+  new WordLesson({
+    id: 'numbers',
+    title: 'Numbers 0–10',
+    description: 'sefr · yek · do · se · ...',
+    question_prompt: 'What is the romanisation of this number?',
+    items: [
+      { persian: '0', roman: 'sefr', name: 'zero'  },
+      { persian: '1', roman: 'yek', name: 'one'   },
+      { persian: '2', roman: 'do', name: 'two'   },
+      { persian: '3', roman: 'se', name: 'three' },
+      { persian: '4', roman: 'chahār', name: 'four'  },
+      { persian: '5', roman: 'panj',  name: 'five'  },
+      { persian: '6', roman: 'shesh', name: 'six'   },
+      { persian: '7', roman: 'haft', name: 'seven' },
+      { persian: '8', roman: 'hasht', name: 'eight' },
+      { persian: '9', roman: 'noh', name: 'nine' },
+      { persian: '10', roman: 'dah', name: 'ten' },
+    ],
+  }),
+
+  new WordLesson({
+    id: 'numbers2',
+    title: 'Numbers 11–20',
+    description: 'yāzdah · dāzdah · ...',
+    question_prompt: 'What is the romanisation of this number?',
+    items: [
+      { persian: '11', roman: 'yāzdah', name: 'eleven' },
+      { persian: '12', roman: 'dāzdah', name: 'twelve' },
+      { persian: '13', roman: 'sizdah', name: 'thirteen' },
+      { persian: '14', roman: 'chahārdah', name: 'fourteen' },
+      { persian: '15', roman: 'pānzdah', name: 'fifteen' },
+      { persian: '16', roman: 'shānzdah', name: 'sixteen' },
+      { persian: '17', roman: 'hēfdah', name: 'seventeen' },
+      { persian: '18', roman: 'hējdah', name: 'eighteen' },
+      { persian: '19', roman: 'nūzdah', name: 'nineteen' },
+      { persian: '20', roman: 'bist', name: 'twenty' },
+    ],
+  }),
+
+  new WordLesson({
+    id: 'numbers3',
+    title: 'Numbers 21–30',
+    description: 'bist o yek · bist o do · ...',
+    question_prompt: 'What is the romanisation of this number?',
+    items: [
+      { persian: '21', roman: 'bist o yek', name: 'twenty-one' },
+      { persian: '22', roman: 'bist o do', name: 'twenty-two' },
+      { persian: '23', roman: 'bist o se', name: 'twenty-three' },
+      { persian: '24', roman: 'bist o chahār', name: 'twenty-four' },
+      { persian: '25', roman: 'bist o pān', name: 'twenty-five' },
+      { persian: '26', roman: 'bist o shesh', name: 'twenty-six' },
+      { persian: '27', roman: 'bist o haft', name: 'twenty-seven' },
+      { persian: '28', roman: 'bist o hasht', name: 'twenty-eight' },
+      { persian: '29', roman: 'bist o noh', name: 'twenty-nine' },
+      { persian: '30', roman: 'sī', name: 'thirty' },
     ],
   }),
 ]
